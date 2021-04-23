@@ -4,11 +4,11 @@
 // as reticências referenciam o nome do episódio, e para 
 // acessá-las usa-se o useRouter com router.query.nomeDoArquivo
 
-import { useRouter } from 'next/router';
 
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 import { api } from '../../services/api';
 
@@ -38,6 +38,12 @@ type EpisodeProps = {
 
 export default function Episode({ episode }: EpisodeProps) {
   const router = useRouter();
+  
+  if (router.isFallback) {  // se a página estiver em processo de carregamento 
+    return(
+      <p>Carregando...</p>
+    )
+  }
 
   return(
     <div className={styles.episode}>
@@ -73,9 +79,39 @@ export default function Episode({ episode }: EpisodeProps) {
   )
 }
 
+// Toda rota que usar esse modelo com colchete precisa informar
+// este método  ###############################################
 export const getStaticPaths: GetStaticPaths = async () => {
+
+  // Busca os episódios mais acessados, por exemplo os 2 últimos
+  // definido os episódios, geramos a página estática para ficar armazenado em cache.
+  // O comportamento esperado é que as páginas tenham o delay (definido no 
+  // script 'server' do arquivo package.json), com exceção das páginas
+  // definidas aqui \/
+  const { data } = await api.get('episodes', {
+    params: {
+      _limit: 2,
+      _sort: 'published_at',
+      _order: 'desc'
+    }
+  })
+
+  const paths = data.map(episode => {
+    return {
+      params: {
+        epNumber: episode.id
+      }
+    }
+  })
+  // -------------------------------------------------------------------------------
+
   return{
-    paths: [],
+    paths,
+
+    // incremental static regeneration
+    // fallback: true  ->  habilita uma página intermediária de carregamento
+    // fallback: 'blocking'  -> o usuário só é redirecionado quando a página destino
+    // estiver carregada
     fallback: 'blocking',
   }
 }
