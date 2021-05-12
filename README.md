@@ -17,7 +17,7 @@
 
 <ul>
     <li><a href="#about">About it</a></li>
-    <li><a href="#techs">Techs</a></li>    <!-- -->
+    <li><a href="#techs">Techs and Tools</a></li>    <!-- -->
     <li><a href="#layout">Layout</a></li>    <!-- -->
     <li><a href="#run">How to run</a></li>    <!-- -->
     <li><a href="#contribute">How to contribute</a></li>    <!-- -->
